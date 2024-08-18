@@ -30,7 +30,8 @@ jobs:
         working-directory: /workdir
         run: |
           df -hT $PWD
-          git clone --depth 1 --branch $repo_tag $repo_url openwrt
+          git clone --depth 1 $repo_url openwrt
+          git checkout $repo_tag 
           ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
       - name: "复制配置文件"
