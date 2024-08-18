@@ -1,0 +1,66 @@
+name: Openwrt Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    - master
+env:
+  repo_url: https://github.com/coolsnowwolf/lede
+  repo_tag: v23.05.4
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: "编译系统初始化"
+        run: |
+          sudo apt-get update
+          sudo apt-get install apt-get install -y time git-core subversion build-essential g++ bash make libssl-dev patch libncurses5 libncurses5-dev zlib1g-dev gawk flex gettext wget unzip xz-utils python python-distutils-extra python3 python3-distutils-extra python3-setuptools swig rsync curl libsnmp-dev liblzma-dev libpam0g-dev cpio rsync gcc-multilib 
+          sudo apt-get autoremove --purge
+          sudo timedatectl set-timezone "$TZ"
+          sudo mkdir -p /workdir
+          sudo chown $USER:$GROUPS /workdir
+
+      - name: "拉取openwrt源码"
+        working-directory: /workdir
+        run: |
+          df -hT $PWD
+          git clone --depth 1 --branch $repo_tag $repo_url openwrt
+          ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+
+      - name: "复制配置文件"
+        run: |
+          cd openwrt
+          mv build_config/* /workdir/openwrt/
+          ls -alh
+      - name: "更新feeds"
+        working-directory: /workdir/openwrt 
+        run:  ./scripts/feeds update -a
+
+      - name: "安装feeds"
+        working-directory: /workdir/openwrt 
+        run:  ./scripts/feeds update -a
+
+      - name: "下载编译所需软件源码"
+        working-directory: /workdir/openwrt 
+        run:   make download -j$(nproc)|| make download -j1 V=s
+      
+      - name: "开始编译"
+        working-directory: /workdir/openwrt 
+        run:  make -j$(nproc) || make -j1 V=s
+
+      - name: "打包编译产物"
+        working-directory: /workdir/openwrt 
+        run:  tar -czvf openwrt_bin.tar.gz bin/
+
+      - name: "上传编译产物"
+        uses: actions/upload-artifact@v4
+        with:
+          name: openwrt_bin.tar.gz
+          path: /workdir/openwrt/openwrt_bin.tar.gz
+      

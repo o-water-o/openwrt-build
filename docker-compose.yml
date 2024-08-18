@@ -1,0 +1,11 @@
+services:
+  openwrt-env:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    network_mode: host
+    container_name: openwrt-env
+    volumes:
+      - ./mybuild:/home/user
+    stdin_open: true
+    tty: true
