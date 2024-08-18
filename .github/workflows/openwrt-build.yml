@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - main
-    - master
+      - main
+      - master
 env:
   repo_url: https://github.com/openwrt/openwrt.git
   repo_tag: v23.05.4
@@ -40,29 +40,26 @@ jobs:
           cp build_config/feeds.conf.default /workdir/openwrt/feeds.conf.default
           cat /workdir/openwrt/feeds.conf.default
       - name: "更新feeds"
-        working-directory: /workdir/openwrt 
-        run:  ./scripts/feeds update -a
+        working-directory: /workdir/openwrt
+        run: ./scripts/feeds update -a
 
       - name: "安装feeds golang"
-        working-directory: /workdir/openwrt 
+        working-directory: /workdir/openwrt
         run: |
           rm -rf feeds/packages/lang/golang
           git clone https://github.com/sbwml/packages_lang_golang -b 22.x feeds/packages/lang/golang
 
       - name: "安装feeds"
-        working-directory: /workdir/openwrt 
-        run:  ./scripts/feeds install -a
-      
+        working-directory: /workdir/openwrt
+        run: ./scripts/feeds install -a
+
       - name: "复制编译配置文件"
         run: |
           cp build_config/.config /workdir/openwrt/.config
           mkdir -p /workdir/openwrt/files/etc/uci-defaults
           cp build_config/99-custom /workdir/openwrt/files/etc/uci-defaults/99-custom
           ls -alh /workdir/openwrt/
-      - name: "下载编译所需软件源码"
-        working-directory: /workdir/openwrt 
-        run:   make defconfig && make download -j$(nproc)|| make download -j1 V=s
-      
+
       - name: "编译器 缓存 ccache"
         uses: actions/cache@v3
         env:
@@ -71,17 +68,20 @@ jobs:
           path: |
             ~/.ccache/
             /workdir/openwrt/staging_dir 
-            /workdir/openwrt/build_dir 
+            /workdir/openwrt/build_dir
+            /workdir/openwrt/dl
           key: ${{ runner.os }}-build-${{ env.cache-name }}
 
-      - name: "开始编译"
-        working-directory: /workdir/openwrt 
-        run:  make -j$(nproc) || make -j1 V=s
+      - name: "下载编译所需软件源码"
+        working-directory: /workdir/openwrt
+        run: make defconfig && make download -j$(nproc)|| make download -j1 V=s
 
+      - name: "开始编译"
+        working-directory: /workdir/openwrt
+        run: make -j$(nproc) || make -j1 V=s
 
       - name: "上传编译产物"
         uses: actions/upload-artifact@v4
         with:
           name: openwrt_bin.tar.gz
           path: /workdir/openwrt/bin
-      
