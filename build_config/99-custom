@@ -1,0 +1,5 @@
+uci -q batch << EOI
+set network.lan.ipaddr='192.168.31.3'
+set network.lan.dns='192.168.31.1'
+set network.lan.gateway='192.168.31.1'
+EOI
