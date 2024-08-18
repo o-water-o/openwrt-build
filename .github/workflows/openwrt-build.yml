@@ -31,6 +31,7 @@ jobs:
         run: |
           df -hT $PWD
           git clone --depth 1 $repo_url openwrt
+          cd openwrt
           git checkout $repo_tag 
           ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
