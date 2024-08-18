@@ -46,7 +46,7 @@ jobs:
 
       - name: "安装feeds"
         working-directory: /workdir/openwrt 
-        run:  ./scripts/feeds update -a
+        run:  ./scripts/feeds install -a
 
       - name: "下载编译所需软件源码"
         working-directory: /workdir/openwrt 
