@@ -63,6 +63,17 @@ jobs:
         working-directory: /workdir/openwrt 
         run:   make defconfig && make download -j$(nproc)|| make download -j1 V=s
       
+      - name: "编译器 缓存 ccache"
+        uses: actions/cache@v3
+        env:
+          cache-name: openwrt-ccache
+        with:
+          path: |
+            ~/.ccache/
+            /workdir/openwrt/staging_dir 
+            /workdir/openwrt/build_dir 
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
       - name: "开始编译"
         working-directory: /workdir/openwrt 
         run:  make -j$(nproc) || make -j1 V=s
