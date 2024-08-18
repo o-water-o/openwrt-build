@@ -56,6 +56,7 @@ jobs:
       - name: "复制编译配置文件"
         run: |
           cp build_config/.config /workdir/openwrt/.config
+          cp build_config/config_generate /workdir/openwrt/package/base-files/files/bin/config_generate
           ls -alh /workdir/openwrt/
       - name: "下载编译所需软件源码"
         working-directory: /workdir/openwrt 
