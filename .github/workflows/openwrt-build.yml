@@ -50,7 +50,7 @@ jobs:
 
       - name: "下载编译所需软件源码"
         working-directory: /workdir/openwrt 
-        run:   make download -j$(nproc)|| make download -j1 V=s
+        run:   make defconfig && make download -j$(nproc)|| make download -j1 V=s
       
       - name: "开始编译"
         working-directory: /workdir/openwrt 
