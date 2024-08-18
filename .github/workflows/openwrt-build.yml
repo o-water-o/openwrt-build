@@ -37,9 +37,9 @@ jobs:
 
       - name: "复制配置文件"
         run: |
-          cd openwrt
+          ls
           mv build_config/* /workdir/openwrt/
-          ls -alh
+          ls -alh /workdir/openwrt/
       - name: "更新feeds"
         working-directory: /workdir/openwrt 
         run:  ./scripts/feeds update -a
