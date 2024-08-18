@@ -7,7 +7,7 @@ on:
     - main
     - master
 env:
-  repo_url: https://github.com/coolsnowwolf/lede
+  repo_url: https://github.com/openwrt/openwrt.git
   repo_tag: v23.05.4
   TZ: Asia/Shanghai
 
