@@ -27,8 +27,8 @@ jobs:
           android: true
           dotnet: true
           haskell: true
-          large-packages: true
-          swap-storage: true
+          large-packages: false
+          swap-storage: false
       - uses: actions/checkout@v4
       - name: "编译系统初始化"
         run: |
@@ -97,5 +97,5 @@ jobs:
       - name: "上传编译产物"
         uses: actions/upload-artifact@v4
         with:
-          name: openwrt_bin.tar.gz
+          name: openwrt_bin
           path: $home_dir/openwrt/bin
