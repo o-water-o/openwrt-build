@@ -10,6 +10,7 @@ env:
   repo_url: https://github.com/openwrt/openwrt.git
   repo_tag: v23.05.4
   TZ: Asia/Shanghai
+  home_dir: /mnt/app
 
 jobs:
   build:
@@ -36,42 +37,42 @@ jobs:
           sudo apt-get autoremove --purge
           sudo apt-get clean
           sudo timedatectl set-timezone "$TZ"
-          sudo mkdir -p /workdir
-          sudo chown $USER:$GROUPS /workdir
+          sudo mkdir -p $home_dir
+          sudo chown $USER:$GROUPS $home_dir
 
       - name: "拉取openwrt源码"
-        working-directory: /workdir
+        working-directory: $home_dir
         run: |
           df -hT $PWD
           git clone $repo_url openwrt
           cd openwrt
           git checkout $repo_tag 
-          ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+          ln -sf $home_dir/openwrt $GITHUB_WORKSPACE/openwrt
 
       - name: "复制feeds配置文件"
         run: |
-          cp build_config/feeds.conf.default /workdir/openwrt/feeds.conf.default
-          cat /workdir/openwrt/feeds.conf.default
+          cp build_config/feeds.conf.default $home_dir/openwrt/feeds.conf.default
+          cat $home_dir/openwrt/feeds.conf.default
       - name: "更新feeds"
-        working-directory: /workdir/openwrt
+        working-directory: $home_dir/openwrt
         run: ./scripts/feeds update -a
 
       - name: "安装feeds golang"
-        working-directory: /workdir/openwrt
+        working-directory: $home_dir/openwrt
         run: |
           rm -rf feeds/packages/lang/golang
           git clone https://github.com/sbwml/packages_lang_golang -b 22.x feeds/packages/lang/golang
 
       - name: "安装feeds"
-        working-directory: /workdir/openwrt
+        working-directory: $home_dir/openwrt
         run: ./scripts/feeds install -a
 
       - name: "复制编译配置文件"
         run: |
-          cp build_config/.config /workdir/openwrt/.config
-          mkdir -p /workdir/openwrt/files/etc/uci-defaults
-          cp build_config/99-custom /workdir/openwrt/files/etc/uci-defaults/99-custom
-          ls -alh /workdir/openwrt/
+          cp build_config/.config $home_dir/openwrt/.config
+          mkdir -p $home_dir/openwrt/files/etc/uci-defaults
+          cp build_config/99-custom $home_dir/openwrt/files/etc/uci-defaults/99-custom
+          ls -alh $home_dir/openwrt/
 
       - name: "编译器 缓存 "
         uses: actions/cache@v3
@@ -80,21 +81,21 @@ jobs:
         with:
           path: |
             ~/.ccache/
-            /workdir/openwrt/staging_dir 
-            /workdir/openwrt/build_dir
-            /workdir/openwrt/dl
+            $home_dir/openwrt/staging_dir 
+            $home_dir/openwrt/build_dir
+            $home_dir/openwrt/dl
           key: ${{ runner.os }}-build-${{ env.cache-name }}
 
       - name: "下载编译所需软件源码"
-        working-directory: /workdir/openwrt
+        working-directory: $home_dir/openwrt
         run: make defconfig && make download -j$(nproc)|| make download -j1 V=s
 
       - name: "开始编译"
-        working-directory: /workdir/openwrt
+        working-directory: $home_dir/openwrt
         run: make -j$(nproc) || make -j1 V=s
 
       - name: "上传编译产物"
         uses: actions/upload-artifact@v4
         with:
           name: openwrt_bin.tar.gz
-          path: /workdir/openwrt/bin
+          path: $home_dir/openwrt/bin
