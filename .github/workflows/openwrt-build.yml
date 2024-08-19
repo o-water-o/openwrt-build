@@ -41,7 +41,7 @@ jobs:
           sudo chown $USER:$GROUPS $home_dir
 
       - name: "拉取openwrt源码"
-        working-directory: $home_dir
+        working-directory: /mnt/app
         run: |
           df -hT $PWD
           git clone $repo_url openwrt
@@ -54,17 +54,17 @@ jobs:
           cp build_config/feeds.conf.default $home_dir/openwrt/feeds.conf.default
           cat $home_dir/openwrt/feeds.conf.default
       - name: "更新feeds"
-        working-directory: $home_dir/openwrt
+        working-directory: /mnt/app/openwrt
         run: ./scripts/feeds update -a
 
       - name: "安装feeds golang"
-        working-directory: $home_dir/openwrt
+        working-directory: /mnt/app/openwrt
         run: |
           rm -rf feeds/packages/lang/golang
           git clone https://github.com/sbwml/packages_lang_golang -b 22.x feeds/packages/lang/golang
 
       - name: "安装feeds"
-        working-directory: $home_dir/openwrt
+        working-directory: /mnt/app/openwrt
         run: ./scripts/feeds install -a
 
       - name: "复制编译配置文件"
@@ -87,11 +87,11 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}
 
       - name: "下载编译所需软件源码"
-        working-directory: $home_dir/openwrt
+        working-directory: /mnt/app/openwrt
         run: make defconfig && make download -j$(nproc)|| make download -j1 V=s
 
       - name: "开始编译"
-        working-directory: $home_dir/openwrt
+        working-directory: /mnt/app/openwrt
         run: make -j$(nproc) || make -j1 V=s
 
       - name: "上传编译产物"
