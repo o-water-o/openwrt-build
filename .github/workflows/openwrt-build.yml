@@ -19,9 +19,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: "编译系统初始化"
         run: |
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
           sudo apt-get update
           sudo apt-get install -y time git-core subversion build-essential g++ bash make libssl-dev patch libncurses5 libncurses5-dev zlib1g-dev gawk flex gettext wget unzip xz-utils python3-distutils-extra python3 python3-distutils-extra python3-setuptools swig rsync curl libsnmp-dev liblzma-dev libpam0g-dev cpio rsync gcc-multilib 
           sudo apt-get autoremove --purge
+          sudo apt-get clean
           sudo timedatectl set-timezone "$TZ"
           sudo mkdir -p /workdir
           sudo chown $USER:$GROUPS /workdir
@@ -60,7 +63,7 @@ jobs:
           cp build_config/99-custom /workdir/openwrt/files/etc/uci-defaults/99-custom
           ls -alh /workdir/openwrt/
 
-      - name: "编译器 缓存 ccache"
+      - name: "编译器 缓存 "
         uses: actions/cache@v3
         env:
           cache-name: openwrt-ccache
