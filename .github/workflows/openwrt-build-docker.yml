@@ -16,22 +16,22 @@ jobs:
         - name: Login to Docker Hub
           uses: docker/login-action@v3
           with:
-            username: ${{ secrets.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_TOKEN }}
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_TOKEN }}
 
         -   name: Check if Docker image exists
             id: check_image
             run: |
-                IMAGE_EXISTS=$(docker manifest inspect ${{ secrets.DOCKERHUB_USERNAME }}/openwrt-build:x86-64-layer01 > /dev/null 2>&1; echo $?)
+                IMAGE_EXISTS=$(docker manifest inspect ${{ secrets.DOCKER_USERNAME }}/openwrt-build:x86-64-layer01 > /dev/null 2>&1; echo $?)
                 echo "IMAGE_EXISTS=$IMAGE_EXISTS" >> $GITHUB_ENV
 
         -   name: Build and push Docker image if it does not exist
             if: env.IMAGE_EXISTS != '0'
             run: |
-                docker build -f Dockerfile.layer01 -t ${{ secrets.DOCKERHUB_USERNAME }}/openwrt-build:x86-64-layer01 .
-                docker push ${{ secrets.DOCKERHUB_USERNAME }}/openwrt-build:x86-64-layer01
+                docker build -f Dockerfile.layer01 -t ${{ secrets.DOCKER_USERNAME }}/openwrt-build:x86-64-layer01 .
+                docker push ${{ secrets.DOCKER_USERNAME }}/openwrt-build:x86-64-layer01
 
         - name: Pull Docker image if it exists
           if: env.IMAGE_EXISTS == '0'
           run: |
-             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/openwrt-build:v1.0
+             docker pull ${{ secrets.DOCKER_USERNAME }}/openwrt-build:v1.0
