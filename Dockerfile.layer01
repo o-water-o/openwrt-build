@@ -25,7 +25,7 @@ RUN git clone https://git.openwrt.org/openwrt/openwrt.git && \
     ./scripts/feeds install -a 
 
 COPY build_config/x86-64.config /home/user/openwrt/.config
-RUN chown -R user /home/user/openwrt/ && \
+RUN sudo chown -R user:user /home/user/openwrt/ && \
     cd openwrt && \
     make defconfig && make download -j$(nproc)|| make download -j1 V=s && \
     make -j$(nproc) || make -j1 V=s
