@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Modify default IP
+uci set network.lan.ipaddr='192.168.100.1'
+
+# Set Hostname
+uci set system.@system[0].hostname='ImmortalWrt'
+
+# Set Timezone
+uci set system.@system[0].timezone='CST-8'
+uci set system.@system[0].zonename='Asia/Shanghai'
+
+# Commit changes
+uci commit network
+uci commit system
+
+exit 0
